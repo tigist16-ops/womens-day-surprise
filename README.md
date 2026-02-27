@@ -1,25 +1,26 @@
-<div id="womens-day-wrapper">
+<div id="surprise-wrapper">
     <canvas id="confetti-canvas"></canvas>
-    <div class="container" id="content-card">
-        </div>
+    <div class="container" id="content-card"></div>
 
     <style>
-        #womens-day-wrapper {
+        /* This covers everything, including any stray text at the top */
+        #surprise-wrapper {
             font-family: 'Segoe UI', Arial, sans-serif;
             text-align: center;
             background: #FFD6F0;
             background: linear-gradient(135deg, #FFE5EC, #FFD6F0);
             color: #D6336C;
-            height: 100vh;
+            position: fixed; 
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            z-index: 999999;
             margin: 0;
-            position: fixed;
-            top: 0;
-            left: 0;
             overflow: hidden;
         }
 
@@ -30,20 +31,11 @@
             box-shadow: 0 15px 35px rgba(214, 51, 108, 0.2);
             max-width: 400px;
             width: 85%;
-            z-index: 10;
-            position: relative;
+            z-index: 1000000;
         }
 
-        h1 { font-size: 2rem; margin: 0 0 10px 0; color: #D6336C; }
-        
-        #timer {
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #b02656;
-            font-family: monospace;
-        }
-
+        h1 { font-size: 2.2rem; margin: 0 0 10px 0; }
+        #timer { font-size: 2rem; font-weight: bold; margin: 20px 0; font-family: monospace; }
         .gift-box { font-size: 5rem; animation: pulse 1.5s infinite; }
 
         @keyframes pulse {
@@ -59,7 +51,6 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 5;
         }
     </style>
 
@@ -67,13 +58,11 @@
         (function() {
             const targetDate = new Date('2026-03-08T12:00:00');
             let celebrated = false;
-
-            // Internal Confetti Logic
             const canvas = document.getElementById('confetti-canvas');
             const ctx = canvas.getContext('2d');
             let pieces = [];
 
-            function initCanvas() {
+            function init() {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
             }
@@ -105,8 +94,8 @@
                 requestAnimationFrame(draw);
             }
 
-            window.addEventListener('resize', initCanvas);
-            initCanvas();
+            window.addEventListener('resize', init);
+            init();
 
             function update() {
                 const now = new Date();
@@ -117,7 +106,7 @@
                     card.innerHTML = `
                         <h1>🎉 Happy Women's Day!</h1>
                         <div class="gift-box">🌸🎁✨</div>
-                        <p style="color: #666; margin-top: 15px;">Celebrate the strength and brilliance of women everywhere!</p>
+                        <p style="color: #666; margin-top: 15px;">Celebrating your strength and brilliance!</p>
                     `;
                     if (!celebrated) {
                         for (let i = 0; i < 100; i++) pieces.push(createPiece());
@@ -134,8 +123,8 @@
 
                 card.innerHTML = `
                     <h1>✨ Almost There...</h1>
-                    <p style="color: #666; font-size: 0.9rem;">Your surprise reveals in:</p>
-                    <div id="timer">${d}d ${h}h ${m}m ${s}s</div>
+                    <p style="color: #666; font-size: 0.9rem;">Your Women's Day surprise reveals in:</p>
+                    <div id="timer">${d}d ${h}h ${m}s</div>
                     <p style="font-size: 0.8rem; opacity: 0.7;">Check back at noon on March 8th!</p>
                 `;
             }
