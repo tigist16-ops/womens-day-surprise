@@ -8,6 +8,7 @@
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             text-align: center;
+            background: #FFD6F0; /* Solid background to hide watermarks */
             background: linear-gradient(135deg, #FFE5EC, #FFD6F0);
             color: #D6336C;
             height: 100vh;
@@ -20,22 +21,23 @@
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.6);
-            padding: 30px;
-            border-radius: 25px;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 10px 30px rgba(214, 51, 108, 0.15);
-            max-width: 85%;
+            background: white; /* Solid white background for the card */
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(214, 51, 108, 0.2);
+            max-width: 400px;
+            width: 80%;
             z-index: 10;
         }
 
-        h1 { font-size: 2.2rem; margin-bottom: 10px; }
+        h1 { font-size: 2rem; margin-bottom: 10px; color: #D6336C; }
         
         #timer {
             font-size: 1.8rem;
             font-weight: bold;
             margin: 20px 0;
             color: #b02656;
+            letter-spacing: 1px;
         }
 
         .gift-box { font-size: 5rem; animation: pulse 1.5s infinite; }
@@ -68,7 +70,7 @@
         const targetDate = new Date('2026-03-08T12:00:00');
         let celebrated = false;
 
-        // --- INTERNAL CONFETTI ENGINE ---
+        // --- CONTEXT-FREE CONFETTI ---
         const canvas = document.getElementById('confetti-canvas');
         const ctx = canvas.getContext('2d');
         let pieces = [];
@@ -83,7 +85,7 @@
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height - canvas.height,
                 rotation: Math.random() * 360,
-                color: ['#FF69B4', '#FFB6C1', '#D6336C', '#FFFFFF'][Math.floor(Math.random() * 4)],
+                color: ['#FF69B4', '#FFB6C1', '#D6336C', '#FFD700'][Math.floor(Math.random() * 4)],
                 size: Math.random() * 10 + 5,
                 speed: Math.random() * 3 + 2
             };
@@ -123,7 +125,7 @@
                 card.innerHTML = `
                     <h1>🎉 Happy Women's Day!</h1>
                     <div class="gift-box">🌸🎁✨</div>
-                    <p>Celebrate the strength, grace, and brilliance of women everywhere!</p>
+                    <p style="color: #666;">Celebrate the strength and brilliance of women everywhere!</p>
                 `;
                 if (!celebrated) {
                     startConfetti();
@@ -138,10 +140,10 @@
             const s = Math.floor((diff / 1000) % 60);
 
             card.innerHTML = `
-                <h1>✨ Something Special...</h1>
-                <p>Your Women's Day surprise reveals in:</p>
-                <div id="timer">${d}d ${h}h ${m}m ${s}s</div>
-                <p>Check back at noon on March 8th!</p>
+                <h1>✨ Almost There...</h1>
+                <p style="color: #666; font-size: 0.9rem;">Your surprise reveals in:</p>
+                <div id="timer">${d}d ${h}h ${m}s</div>
+                <p style="font-size: 0.8rem; opacity: 0.7;">Check back at noon on March 8th!</p>
             `;
         }
 
