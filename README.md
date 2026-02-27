@@ -131,7 +131,7 @@
         var countdownStr =
             days + "d " + hours + "h " + minutes + "m " + seconds + "s";
 
-        // Only update innerHTML if changed, for a subtle pop (if you want digit animation, you could enhance here)
+        // Only update innerHTML if changed, for a subtle pop
         if (lastCountdown !== countdownStr) {
             countdownElem.innerHTML = countdownStr;
             lastCountdown = countdownStr;
@@ -144,4 +144,4 @@
 </script>
 
 </body>
-</html>              
+</html>
