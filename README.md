@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Women's Day Surprise 🎉</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             text-align: center;
             background: linear-gradient(135deg, #FFE5EC, #FFD6F0);
             color: #D6336C;
@@ -21,97 +20,131 @@
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.4);
-            padding: 2rem;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(214, 51, 108, 0.1);
-            max-width: 90%;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 30px;
+            border-radius: 25px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 30px rgba(214, 51, 108, 0.15);
+            max-width: 85%;
+            z-index: 10;
         }
 
-        h1 { font-size: 2.5rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; margin-bottom: 20px; }
-
+        h1 { font-size: 2.2rem; margin-bottom: 10px; }
+        
         #timer {
-            font-family: monospace;
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: bold;
-            background: #D6336C;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            display: inline-block;
+            margin: 20px 0;
+            color: #b02656;
         }
 
-        .gift { font-size: 5rem; animation: bounce 2s infinite; }
+        .gift-box { font-size: 5rem; animation: pulse 1.5s infinite; }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
         }
     </style>
 </head>
 <body>
 
-    <div class="container" id="main-card">
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="container" id="content-card">
         </div>
 
     <script>
         const targetDate = new Date('2026-03-08T12:00:00');
-        let hasCelebrated = false;
+        let celebrated = false;
 
-        function fireConfetti() {
-            const duration = 5 * 1000;
-            const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+        // --- INTERNAL CONFETTI ENGINE ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let pieces = [];
 
-            const interval = setInterval(function() {
-                const timeLeft = animationEnd - Date.now();
-                if (timeLeft <= 0) return clearInterval(interval);
-
-                const particleCount = 50 * (timeLeft / duration);
-                confetti({...defaults, particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 }});
-            }, 250);
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
 
+        function createPiece() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                rotation: Math.random() * 360,
+                color: ['#FF69B4', '#FFB6C1', '#D6336C', '#FFFFFF'][Math.floor(Math.random() * 4)],
+                size: Math.random() * 10 + 5,
+                speed: Math.random() * 3 + 2
+            };
+        }
+
+        function drawConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            pieces.forEach((p, i) => {
+                p.y += p.speed;
+                p.rotation += p.speed;
+                ctx.fillStyle = p.color;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation * Math.PI / 180);
+                ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                ctx.restore();
+                if (p.y > canvas.height) pieces[i] = createPiece();
+            });
+            requestAnimationFrame(drawConfetti);
+        }
+
+        function startConfetti() {
+            for (let i = 0; i < 100; i++) pieces.push(createPiece());
+            drawConfetti();
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+
+        // --- COUNTDOWN LOGIC ---
         function update() {
             const now = new Date();
             const diff = targetDate - now;
-            const card = document.getElementById('main-card');
+            const card = document.getElementById('content-card');
 
             if (diff <= 0) {
-                // THE REVEAL
                 card.innerHTML = `
                     <h1>🎉 Happy Women's Day!</h1>
-                    <p>You deserve all the flowers today!</p>
-                    <div class="gift">🌸🎀🎁</div>
-                    <p style="margin-top:20px;">Enjoy your special surprise!</p>
+                    <div class="gift-box">🌸🎁✨</div>
+                    <p>Celebrate the strength, grace, and brilliance of women everywhere!</p>
                 `;
-                
-                if (!hasCelebrated) {
-                    fireConfetti();
-                    hasCelebrated = true;
+                if (!celebrated) {
+                    startConfetti();
+                    celebrated = true;
                 }
                 return;
             }
 
-            // THE COUNTDOWN
-            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-            const m = Math.floor((diff / 1000 / 60) % 60);
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff / 3600000) % 24);
+            const m = Math.floor((diff / 60000) % 60);
             const s = Math.floor((diff / 1000) % 60);
 
             card.innerHTML = `
-                <h1>✨ Almost There...</h1>
+                <h1>✨ Something Special...</h1>
                 <p>Your Women's Day surprise reveals in:</p>
                 <div id="timer">${d}d ${h}h ${m}m ${s}s</div>
-                <p style="margin-top:20px; font-size: 0.9em; opacity: 0.8;">
-                    Keep this tab open or scan the QR code again at noon!
-                </p>
+                <p>Check back at noon on March 8th!</p>
             `;
         }
 
-        // Run the clock
         setInterval(update, 1000);
         update();
     </script>
