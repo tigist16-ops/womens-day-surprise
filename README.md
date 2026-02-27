@@ -1,136 +1,147 @@
-<div id="surprise-wrapper">
-    <canvas id="confetti-canvas"></canvas>
-    <div class="container" id="content-card"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Women's Day Surprise</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f8c8dc;
+        color: #c2185b;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        text-align: center;
+    }
 
-    <style>
-        /* This covers everything, including any stray text at the top */
-        #surprise-wrapper {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            text-align: center;
-            background: #FFD6F0;
-            background: linear-gradient(135deg, #FFE5EC, #FFD6F0);
-            color: #D6336C;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 999999;
-            margin: 0;
-            overflow: hidden;
+    main.container {
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        max-width: 420px;
+        width: 90vw;
+    }
+
+    h1 {
+        margin-bottom: 10px;
+    }
+
+    .countdown {
+        font-size: 28px;
+        font-weight: bold;
+        margin: 20px 0;
+        min-height: 44px;
+        letter-spacing: 2px;
+        transition: color 0.4s;
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+        0% { color: #c2185b; text-shadow: 0 0 0 #f06292; }
+        50% { color: #8e004d; text-shadow: 0 2px 12px #f06292; }
+        100% { color: #c2185b; text-shadow: 0 0 0 #f06292; }
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .gift {
+        font-size: 22px;
+        color: #8e004d;
+        margin-top: 20px;
+        font-weight: bold;
+    }
+
+    /* Surprise animation */
+    #surprise {
+        opacity: 0;
+        transform: translateY(40px) scale(0.98);
+        transition: opacity 1s cubic-bezier(.45,.05,.55,.95), transform 1s cubic-bezier(.45,.05,.55,.95);
+        will-change: opacity, transform;
+    }
+    #surprise.show {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+</style>
+</head>
+
+<body>
+
+<main class="container" aria-label="Women's Day Celebration">
+    <h1>🌸 Happy Women's Day! 🌸</h1>
+    <p>Today we celebrate your strength, kindness, and the amazing energy you bring every day.</p>
+    <p>Your special surprise will be revealed soon!</p>
+
+    <div id="countdown" class="countdown" aria-live="polite"></div>
+
+    <div id="surprise" class="hidden">
+        <p class="gift">🎁 It's Surprise Time!</p>
+        <p>Please see the event host to receive your gift.</p>
+    </div>
+</main>
+
+<script>
+    // Automatically find the next March 7 at 10:00 AM
+    function getNextWomensDayDate() {
+        var now = new Date();
+        var year = now.getFullYear();
+
+        // March is month 2 (0-based), day 7, 10:00 AM
+        var eventDate = new Date(year, 2, 7, 10, 0, 0);
+
+        // If today is past March 7, 10:00 AM this year, use next year
+        if (now > eventDate) {
+            eventDate = new Date(year + 1, 2, 7, 10, 0, 0);
+        }
+        return eventDate.getTime();
+    }
+
+    var eventDate = getNextWomensDayDate();
+    var lastCountdown = "";
+
+    var countdownFunction = setInterval(function() {
+        var now = new Date().getTime();
+        var distance = eventDate - now;
+
+        var countdownElem = document.getElementById("countdown");
+        var surpriseElem = document.getElementById("surprise");
+
+        if (distance <= 0) {
+            clearInterval(countdownFunction);
+            countdownElem.style.display = "none";
+            // Animate reveal
+            surpriseElem.classList.remove("hidden");
+            setTimeout(function() {
+                surpriseElem.classList.add("show");
+            }, 30); // Allow rendering .hidden removed before adding .show
+            return;
         }
 
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(214, 51, 108, 0.2);
-            max-width: 400px;
-            width: 85%;
-            z-index: 1000000;
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        var countdownStr =
+            days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+
+        // Only update innerHTML if changed, for a subtle pop (if you want digit animation, you could enhance here)
+        if (lastCountdown !== countdownStr) {
+            countdownElem.innerHTML = countdownStr;
+            lastCountdown = countdownStr;
         }
 
-        h1 { font-size: 2.2rem; margin: 0 0 10px 0; }
-        #timer { font-size: 2rem; font-weight: bold; margin: 20px 0; font-family: monospace; }
-        .gift-box { font-size: 5rem; animation: pulse 1.5s infinite; }
+        countdownElem.setAttribute("aria-label",
+            days + " days, " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds remaining.");
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
+    }, 1000);
+</script>
 
-        #confetti-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-    </style>
-
-    <script>
-        (function() {
-            const targetDate = new Date('2026-03-08T12:00:00');
-            let celebrated = false;
-            const canvas = document.getElementById('confetti-canvas');
-            const ctx = canvas.getContext('2d');
-            let pieces = [];
-
-            function init() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-
-            function createPiece() {
-                return {
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height - canvas.height,
-                    rotation: Math.random() * 360,
-                    color: ['#FF69B4', '#FFB6C1', '#D6336C', '#FFD700'][Math.floor(Math.random() * 4)],
-                    size: Math.random() * 10 + 5,
-                    speed: Math.random() * 3 + 2
-                };
-            }
-
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                pieces.forEach((p, i) => {
-                    p.y += p.speed;
-                    p.rotation += p.speed;
-                    ctx.fillStyle = p.color;
-                    ctx.save();
-                    ctx.translate(p.x, p.y);
-                    ctx.rotate(p.rotation * Math.PI / 180);
-                    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
-                    ctx.restore();
-                    if (p.y > canvas.height) pieces[i] = createPiece();
-                });
-                requestAnimationFrame(draw);
-            }
-
-            window.addEventListener('resize', init);
-            init();
-
-            function update() {
-                const now = new Date();
-                const diff = targetDate - now;
-                const card = document.getElementById('content-card');
-
-                if (diff <= 0) {
-                    card.innerHTML = `
-                        <h1>🎉 Happy Women's Day!</h1>
-                        <div class="gift-box">🌸🎁✨</div>
-                        <p style="color: #666; margin-top: 15px;">Celebrating your strength and brilliance!</p>
-                    `;
-                    if (!celebrated) {
-                        for (let i = 0; i < 100; i++) pieces.push(createPiece());
-                        draw();
-                        celebrated = true;
-                    }
-                    return;
-                }
-
-                const d = Math.floor(diff / 86400000);
-                const h = Math.floor((diff / 3600000) % 24);
-                const m = Math.floor((diff / 60000) % 60);
-                const s = Math.floor((diff / 1000) % 60);
-
-                card.innerHTML = `
-                    <h1>✨ Almost There...</h1>
-                    <p style="color: #666; font-size: 0.9rem;">Your Women's Day surprise reveals in:</p>
-                    <div id="timer">${d}d ${h}h ${m}s</div>
-                    <p style="font-size: 0.8rem; opacity: 0.7;">Check back at noon on March 8th!</p>
-                `;
-            }
-
-            setInterval(update, 1000);
-            update();
-        })();
-    </script>
-</div>
+</body>
+</html>              
